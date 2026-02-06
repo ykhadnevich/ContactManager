@@ -1,0 +1,168 @@
+@model List<ContactManager.Web.Models.ContactViewModel>
+
+@{
+    ViewData["Title"] = "Contact Manager";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="bi bi-person-lines-fill"></i> Contact Manager
+            </h1>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill"></i> @TempData["Warning"]
+            @if (TempData["Errors"] != null)
+            {
+                <hr/>
+                <small>@Html.Raw(TempData["Errors"])</small>
+            }
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Upload Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-cloud-upload"></i> Upload CSV File
+            </h5>
+            <form id="uploadForm" asp-action="Upload" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" required />
+                        <small class="form-text text-muted">
+                            Expected format: Name, Date of Birth, Married, Phone, Salary
+                        </small>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-upload"></i> Upload & Import
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name, phone...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Marital Status</label>
+                    <select id="marriedFilter" class="form-select">
+                        <option value="">All</option>
+                        <option value="true">Married</option>
+                        <option value="false">Single</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sort By</label>
+                    <select id="sortSelect" class="form-select">
+                        <option value="name">Name</option>
+                        <option value="dateOfBirth">Date of Birth</option>
+                        <option value="salary">Salary</option>
+                        <option value="age">Age</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Order</label>
+                    <select id="sortOrder" class="form-select">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacts Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-table"></i> Contacts 
+                <span id="contactCount" class="badge bg-primary">@Model.Count</span>
+            </h5>
+            
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="contactsTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Date of Birth</th>
+                                <th>Age</th>
+                                <th>Married</th>
+                                <th>Phone</th>
+                                <th>Salary</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactsTableBody">
+                            @foreach (var contact in Model)
+                            {
+                                <tr data-id="@contact.Id">
+                                    <td class="editable" data-field="name">@contact.Name</td>
+                                    <td class="editable" data-field="dateOfBirth" data-type="date">@contact.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                                    <td class="age-cell">@contact.Age</td>
+                                    <td class="editable" data-field="married" data-type="boolean">
+                                        @(contact.Married ? "Yes" : "No")
+                                    </td>
+                                    <td class="editable" data-field="phone">@contact.Phone</td>
+                                    <td class="editable" data-field="salary" data-type="number">@contact.Salary.ToString("C")</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-success edit-btn" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger delete-btn" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No contacts found. Upload a CSV file to get started.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/contacts.js"></script>
+}

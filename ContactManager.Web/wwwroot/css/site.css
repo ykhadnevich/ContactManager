@@ -1,0 +1,60 @@
+/* Contact Manager Custom Styles */
+
+body {
+  background-color: #f8f9fa;
+}
+
+.table-responsive {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.editable {
+  cursor: pointer;
+  position: relative;
+}
+
+.editable:hover {
+  background-color: #f0f0f0;
+}
+
+.editable input,
+.editable select {
+  width: 100%;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+}
+
+.card-title {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.footer {
+  padding: 20px 0;
+  margin-top: 50px;
+}
+
+.alert {
+  border-radius: 8px;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
